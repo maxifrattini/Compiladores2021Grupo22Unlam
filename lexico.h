@@ -8,7 +8,6 @@
 #include "y.tab.h"
 #include "ts.h"
 FILE  *yyin;
-
 char* normalizar(char*);
 
 /* FUNCIONES */
@@ -19,41 +18,41 @@ int validarID(char *str);
 
 %option noyywrap 
 %option yylineno
-DIGITO					[0-9]
-LETRA					[a-zA-Z]
+DIGITO			[0-9]
+LETRA			[a-zA-Z]
 COMA                    [","]
 CONST_STR               \"({LETRA}|{DIGITO}|.)+\"
 COMENTARIOS             (\*\*\*\/).*(\/\*\*\*)
 CONST_REAL              {DIGITO}+"."{DIGITO}+
 CONST_INT               {DIGITO}+
-ID						{LETRA}({LETRA}|{DIGITO})*
-OP_ASIG   				[":="]
-ASIG_ESP				(\+=)|(\-=)|(\*=)|(\/=)
+ID			{LETRA}({LETRA}|{DIGITO})*
+OP_ASIG   		":="]
+ASIG_ESP		(\+=)|(\-=)|(\*=)|(\/=)
 C_A                     ["["]
 C_C                     ["]"]
-ESPACIO					" "
+ESPACIO			" "
 
 
 %%
 "DEFVAR"|"defvar"		{ return DEFVAR; }
-"int"|"INT"				{ return INT; }
+"int"|"INT"			{ return INT; }
 "float"|"FLOAT"			{ return FLOAT; }
 "string"|"STRING"		{ return STRING; }
 "ENDDEF"|"enddef"		{ return ENDDEF; }
 "display"|"DISPLAY"		{ return DISPLAY; }
-"get"|"GET"				{ return GET; }
+"get"|"GET"			{ return GET; }
 "while"|"WHILE"			{ return WHILE; }
-"if"|"IF"				{ return IF; }
+"if"|"IF"			{ return IF; }
 "else"|"ELSE"			{ return ELSE; }
-"LET"|"let"				{ return LET_SIM;}
-{CONST_INT}				{ 
+"LET"|"let"			{ return LET_SIM;}
+{CONST_INT}			{ 
 							strcpy(yylval.strval, yytext);
 							int casteado = atoi(yytext);
 							if( casteado > 65536) {
 								
 								printf("ERROR Lexico - Entero \'%d\' fuera de rango. Debe estar entre [0; 65536]", casteado);
 								return 0;
-							}
+						}
 							insertInTs(normalizar(yytext), "CONST_INT", yytext, "");
 							return CONST_INT;
 						 }
@@ -87,29 +86,29 @@ ESPACIO					" "
 "<="                    { return CMP_MENI;}
 "!="                    { return CMP_DIST;}
 "=="                    { return CMP_IGUAL;}
-":="					{ return OP_ASIG;}
-"+"						{ return OP_SUM;}
-"-"						{ return OP_RES;}
-"*"						{ return OP_MUL;}
-"/"						{ return OP_DIV;}
-"("						{ return P_A;}
-")"						{ return P_C;}
-"["						{ printf("C_A ");}
-"]"						{ printf("C_C ");}
-"{"						{ return L_A;}
-"}"						{ return L_C;}
-";"						{ return PUNTO_Y_COMA;}
-":"						{return DOSPUNTOS;}
-","						{ return COMA;}
-"="						{ return OP_IGUAL;}
-"and"|"AND"				{ return AND;}
-"or"|"OR"				{ return OR;}
-"not"|"NOT"				{ return NOT;}
-{COMENTARIOS} 			{ ;} 
+":="			{ return OP_ASIG;}
+"+"			{ return OP_SUM;}
+"-"			{ return OP_RES;}
+"*"			{ return OP_MUL;}
+"/"			{ return OP_DIV;}
+"("			{ return P_A;}
+")"			{ return P_C;}
+"["			{ printf("C_A ");}
+"]"			{ printf("C_C ");}
+"{"			{ return L_A;}
+"}"			{ return L_C;}
+";"			{ return PUNTO_Y_COMA;}
+":"			{return DOSPUNTOS;}
+","			{ return COMA;}
+"="			{ return OP_IGUAL;}
+"and"|"AND"		{ return AND;}
+"or"|"OR"		{ return OR;}
+"not"|"NOT"		{ return NOT;}
+{COMENTARIOS} 		{ ;} 
 {ID}					{ 	yylval.strval = strdup(yytext);
-							validarID(yylval.strval);
- 							insertInTs(yytext, "", "", "");
-							return ID;
+						validarID(yylval.strval);
+ 						insertInTs(yytext, "", "", "");
+						return ID;
 						}
 {ASIG_ESP}				{ return ASIG_ESP;}
 \n\r
