@@ -14,6 +14,8 @@ char* normalizar(char*);
 
 int validarID(char *str);
 
+int long (char *str); 	//long ([a,b,c,e]) = 4
+
 %}
 
 %option noyywrap 
