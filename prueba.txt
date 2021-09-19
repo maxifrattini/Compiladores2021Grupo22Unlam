@@ -1,0 +1,7 @@
+[a,b,c,e] \\correcto 4 
+[] \\0 
+[a,b,,e] \\error
+a,b,c,e  \\error
+[a,b,c,e \\error
+a,b,c,e] \\error
+
