@@ -46,7 +46,7 @@ ESPACIO			" "
 "while"|"WHILE"			{ return WHILE; }
 "if"|"IF"			{ return IF; }
 "else"|"ELSE"			{ return ELSE; }
-"LET"|"let"			{ return LET_SIM;}
+"long|LONG"			{ return LONG; }
 {CONST_INT}			{ 
 							strcpy(yylval.strval, yytext);
 							int casteado = atoi(yytext);
