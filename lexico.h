@@ -126,7 +126,8 @@ LONG			long(LISTA);
 \n
 \t
 {ESPACIO}
-" "						/*estos ultimos 5 son para borrar los tabs, expacios, etc*/
+" "						
+	/*estos ultimos 5 son para borrar los tabs, expacios, etc*/
 
 
 %%
