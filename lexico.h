@@ -33,7 +33,13 @@ ASIG_ESP		(\+=)|(\-=)|(\*=)|(\/=)
 C_A                     ["["]
 C_C                     ["]"]
 ESPACIO			" "
+LISTA			[ID?|ID(,ID)+]
+LONG			long(LISTA);
 
+
+//1 long ([]);
+//2 long ([a]);
+//3 long ([a,b,c]);
 
 %%
 "DEFVAR"|"defvar"		{ return DEFVAR; }
