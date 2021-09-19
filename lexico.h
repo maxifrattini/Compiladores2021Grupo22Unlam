@@ -55,6 +55,9 @@ LONG			long(LISTA);
 "if"|"IF"			{ return IF; }
 "else"|"ELSE"			{ return ELSE; }
 "long|LONG"			{ return LONG; }
+"equmax|EQUMAX"			{ return EQUMAX; }
+"equmin|EQUMIN"			{ return EQUMIN; }
+
 {CONST_INT}			{ 
 							strcpy(yylval.strval, yytext);
 							int casteado = atoi(yytext);
