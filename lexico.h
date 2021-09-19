@@ -14,7 +14,8 @@ char* normalizar(char*);
 
 int validarID(char *str);
 
-int long (char *str); 	//long ([a,b,c,e]) = 4
+//int long (char *str); 	
+	//long ([a,b,c,e]) = 4
 
 %}
 
@@ -23,6 +24,7 @@ int long (char *str); 	//long ([a,b,c,e]) = 4
 DIGITO			[0-9]
 LETRA			[a-zA-Z]
 COMA                    [","]
+PUNTO                    ["."]
 CONST_STR               \"({LETRA}|{DIGITO}|.)+\"
 COMENTARIOS             (\*\*\*\/).*(\/\*\*\*)
 CONST_REAL              {DIGITO}+"."{DIGITO}+
@@ -108,6 +110,7 @@ LONG			long(LISTA);
 ";"			{ return PUNTO_Y_COMA;}
 ":"			{return DOSPUNTOS;}
 ","			{ return COMA;}
+"."			{ return PUNTO;}
 "="			{ return OP_IGUAL;}
 "and"|"AND"		{ return AND;}
 "or"|"OR"		{ return OR;}
