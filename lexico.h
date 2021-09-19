@@ -37,6 +37,10 @@ C_C                     ["]"]
 ESPACIO			" "
 LISTA			[ID?|ID(,ID)+]
 LONG			long(LISTA);
+EQUMAX			equmax(CONST_INT|CONST_INT*
+
+
+//IF EQUMAX(10+101; [100, 111, var1] ) */será falsa /*
 
 
 //1 long ([]);
