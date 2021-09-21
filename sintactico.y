@@ -1,117 +1,98 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include <conio.h>
-#include "y.tab.h"
-#include "pila-dinamica.h"
 #include "ts.h"
 
-int yystopparser=0;
 FILE  *yyin;
 extern int yylineno;
-int cont_1 = 0;
-int cont_2 = 0;
-
+int yylex();
+int yyerror();
 %}
+
 %union{
 	  char *strval;
 	  char a_e[2];
-    
 }
 
-%{
-pila_s pilaDeclares;
-%}
-
-
-/*%token INI_DEFVAR
-%token FIN_DEFVAR
-%token <str_val> ID
-%token PUNTOCOMA
-%token DOSPUNTOS
-%token DEF_INT
-%token DEF_FLOAT
-*/
 %token <a_e> ASIG_ESP
-%token DEFVAR ENDDEF 
-%token INT FLOAT STRING
+%token DEFVAR DIM AS ENDDEF
+%token REAL INT STRING
 %token CONST_REAL CONST_INT CONST_STR
+%token LISTA LONGITUD
 %token DISPLAY GET
 %token IF ELSE WHILE         
-%token P_A P_C C_A C_C L_A L_C PUNTO_Y_COMA COMA DOSPUNTOS
+%token P_A P_C C_A C_C L_A L_C PUNTO PUNTO_Y_COMA COMA DOSPUNTOS
 %token CMP_MAY CMP_MEN CMP_MAYI CMP_MENI CMP_DIST CMP_IGUAL
 %token OP_SUM OP_RES OP_DIV OP_MUL
 %token AND OR NOT
 %type <strval> expresion
 %token <strval> ID
 %token OP_ASIG
-%token LET_SIM
 %token OP_IGUAL
-
 
 %%
 
-programa: program {printf("\nprogram - program\nCompilacion OK\n");};
+programa: program {printf("\nprogram - program\nCompilacion exitosa\n");};
 program:
 	sentencia 				{printf("\nprogram - sentencia");}
 	| program sentencia 	{printf("\nprogram - program sentencia");}
 	;
 	
-sentencia: DEFVAR {crearPilaS(&pilaDeclares); } declaraciones ENDDEF {printf("\nsentencia - DEFVAR declaraciones ENDDEF");}
-			| ID ASIG_ESP ID 	{printf("\nsentencia - ID ASIG_ESP ID");}
+sentencia:DEFVAR declaraciones ENDDEF{printf("\nsentencia - DEFVAR declaraciones ENDDEF");}
+			| ID ASIG_ESP factor {printf("\nSentencia - ID ASIG_ESP factor");}
+			| funcion {printf("\nsentencia - funcion");}
             | asignacion PUNTO_Y_COMA { printf("\nsentencia - asignacion");}
             | decision              {   printf("\nsentencia - decision");}
             | iteracion             { printf("\nsentencia - iteracion");}
-			| let					{ printf("\nsentencia - let");}
             | entrada               {printf("\nsentencia - entrada");}
             | salida                {printf("\nsentencia - salida");}
 	        ;
-	
+
+funcion: LONGITUD P_A C_A lista_ids C_C P_C{
+													printf("\nsentencia - LONGITUD P_A C_A lista_ids C_C P_C");
+												};
+
 declaraciones:         	        	
              declaracion					{ printf("\ndeclaraciones - declaracion");}
              | declaraciones declaracion	{printf("\ndeclaraciones - declaraciones declaracion");}
     	     ;
 
-declaracion: INT DOSPUNTOS lista_ids {  
-
-                                        while(!pilaVaciaS(&pilaDeclares)){
-                                            char *id = sacarDePilaS(&pilaDeclares);
-                                            char *type = "INTEGER";
-                                            modifyTypeTs(id, type);
-                                        } 
-                                        printf("\ndeclaracion - INT DOSPUNTOS lista_ids");
+declaracion:  DIM C_A lista_ids C_C AS C_A lista_tipo_datos C_C{  
+                                        printf("\ndeclaracion - DIM C_A lista_ids C_C AS C_A lista_tipo_datos C_C");
                                     }
-            |FLOAT DOSPUNTOS lista_ids {    
-                                            while(!pilaVaciaS(&pilaDeclares)){
-                                                char *id = sacarDePilaS(&pilaDeclares);
-                                                char *type = "FLOAT";
-                                                modifyTypeTs(id, type);
-                                            } 
-                                            printf("\ndeclaracion - FLOAT DOSPUNTOS lista_ids");
-                                        }
-            |STRING DOSPUNTOS lista_ids	{
-                                             while(!pilaVaciaS(&pilaDeclares)){
-                                                char *id = sacarDePilaS(&pilaDeclares);
-                                                char *type = "STRING";
-                                                
-                                                modifyTypeTs(id, type);
-                                            } 
-                                            printf("\ndeclaracion - STRING DOSPUNTOS lista_ids");
-            };
-	
-lista_ids:  	ID 	{ ponerEnPilaS(&pilaDeclares, $1); printf("\nlista_ids - ID '%s'",yylval.strval);}
-			| lista_ids PUNTO_Y_COMA ID	{ponerEnPilaS(&pilaDeclares, $3), printf("\nlista_ids - lista_ids PUNTO_Y_COMA ID '%s'",yylval.strval);}
 			;
-   	
-asignacion:
-    ID OP_ASIG expresion { printf("\nasignacion ID - OP_ASIG - expresion");}
-    | ID OP_ASIG constanteString { printf("\nasignacion ID - OP_ASIG - CTE_STRING");}
-;
 
+lista_ids: ID { printf("\nlista_ids - ID '%s'",yylval.strval);}
+			| lista_ids COMA ID {printf("\nlista_ids - lista_ids COMA ID '%s'",yylval.strval);}
+			;
+			
+tipo_dato: INT 			{	
+							printf("\n tipo de dato : INT");
+						}
+	| REAL			{	
+							printf("\n tipo de dato : REAL");
+						}
+	| STRING		{	
+							printf("\n tipo de dato : STRING");
+						}
+	;
+
+lista_tipo_datos: tipo_dato {
+									printf("\n lista tipo dato : dato");
+								}
+	| lista_tipo_datos COMA tipo_dato {
+											printf("\n lista tipo dato : lista_datos");
+										}
+	;
 entrada:
     DISPLAY ID  PUNTO_Y_COMA        {printf("\nentrada DISPLAY - ID"); }
     | DISPLAY constanteString PUNTO_Y_COMA {printf("\nentrada DISPLAY - CONST_STR"); }
     ;
+	
+asignacion:
+    ID OP_ASIG expresion { printf("\nasignacion ID - OP_ASIG - expresion");}
+    | ID OP_ASIG constanteString { printf("\nasignacion ID - OP_ASIG - CTE_STRING");}
+;
     
 salida:
     GET ID  PUNTO_Y_COMA {printf("\nsalida GET - ID"); }
@@ -218,7 +199,7 @@ factor:
                                     
                                     }
     | constanteNumerica         {   printf("\nfactor - constanteNumerica");
-                                     }                    
+                                     }  
     ;
 
 constanteNumerica: 
@@ -237,44 +218,24 @@ constanteString:
                         }
     ;
 
-let: LET_SIM cont_ids OP_IGUAL P_A cont_exp P_C {
-				if(cont_1==cont_2){
-					printf("\nsentencia - LET_SIM cont_ids OP_IGUAL P_A cont_exp P_C");
-					/*printf("\nvalores cont_1: %d cont_2: %d",cont_1,cont_2);*/
-					cont_1 = 0;
-					cont_2 = 0;
-				}else{
-					yyerror();
-				}
-				}
-	;
-	
-cont_ids: cont_ids COMA ID {cont_1++;printf("\ncont_ids - cont_ids COMA ID");}
-			| ID {cont_1++; printf("\ncont_ids - ID");}
-			;
-
-cont_exp: cont_exp PUNTO_Y_COMA expresion {cont_2++;printf("\ncont_exp - cont_exp PUNTO_Y_COMA expresion");}
-			| expresion {cont_2++;printf("\ncont_exp - expresion");}
-			;
-
 %%
 
 int main(int argc,char *argv[])
 {
-  if ((yyin = fopen(argv[1], "rt")) == NULL)
-  {
-	printf("\nNo se puede abrir el archivo: %s\n", argv[1]);
-  }
-  else
-  {
-	yyparse();
-  }
-  fclose(yyin);
-  return 0;
+	if ((yyin = fopen(argv[1], "rt")) == NULL)
+	{
+		printf("\nNo se puede abrir el archivo: %s\n", argv[1]);
+	}
+	else
+	{
+			yyparse();
+	}
+	fclose(yyin);
+	return 0;
 }
 int yyerror(void)
-     {
-       printf("Syntax Error en la linea: %d\n", yylineno);
-	 system ("Pause");
-	 exit (1);
-     }
+{
+	printf("Syntax Error en la linea: %d\n", yylineno);
+	system ("Pause");
+	exit (1);
+}

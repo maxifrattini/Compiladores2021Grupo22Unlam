@@ -1,0 +1,9 @@
+NAME                                TYPE                 VALUE                                         LENGTH              
+var1                                                                                                                       
+var3                                                                                                                       
+var4                                                                                                                       
+var2                                                                                                                       
+_5                                  CONST_INT            5                                                                 
+_6                                  CONST_INT            6                                                                 
+_3                                  CONST_INT            3                                                                 
+_1                                  CONST_INT            1                                                                 

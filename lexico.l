@@ -4,65 +4,57 @@
 #include <float.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <conio.h>
 #include "y.tab.h"
 #include "ts.h"
+
 FILE  *yyin;
-char* normalizar(char*);
 
 /* FUNCIONES */
 
+char* normalizar(char*);
 int validarID(char *str);
-
-//int long (char *str); 	
-	//long ([a,b,c,e]) = 4
+int longitud(char *str);
 
 %}
 
 %option noyywrap 
 %option yylineno
-DIGITO			[0-9]
-LETRA			[a-zA-Z]
-COMA                    [","]
-PUNTO                    ["."]
+
+DIGITO					[0-9]
+LETRA					[a-zA-Z]
+COMA                    ","
+PUNTO                   "."
 CONST_STR               \"({LETRA}|{DIGITO}|.)+\"
-COMENTARIOS             (\*\*\*\/).*(\/\*\*\*)
-CONST_REAL              {DIGITO}+"."{DIGITO}+
+COMENTARIOS             (\*\/).*(\/\*)
+CONST_REAL              {DIGITO}+{PUNTO}{DIGITO}+
 CONST_INT               {DIGITO}+
-ID			{LETRA}({LETRA}|{DIGITO})*
-OP_ASIG   		":="]
-ASIG_ESP		(\+=)|(\-=)|(\*=)|(\/=)
-C_A                     ["["]
-C_C                     ["]"]
-ESPACIO			" "
-LISTA			[ID?|ID(,ID)+]
-LONG			long(LISTA);
-EQUMAX			equmax(CONST_INT|CONST_INT*
-
-
-//IF EQUMAX(10+101; [100, 111, var1] ) */será falsa /*
-
-
-//1 long ([]);
-//2 long ([a]);
-//3 long ([a,b,c]);
+ID						{LETRA}({LETRA}|{DIGITO})*
+OP_ASIG   				":="
+ASIG_ESP				(\+=)|(\-=)|(\*=)|(\/=)
+C_A                     "["
+C_C                     "]"
+ESPACIO					" "
 
 %%
-"DEFVAR"|"defvar"		{ return DEFVAR; }
-"int"|"INT"			{ return INT; }
-"float"|"FLOAT"			{ return FLOAT; }
+"lista"|"LISTA"			{ return LISTA; }
+"longitud"|"LONGITUD"	{ yylval.strval = strdup(yytext);
+						  longitud(yylval.strval);
+						  return LONGITUD;
+						}
+"defvar"|"DEFVAR"		{ return DEFVAR; }
+"dim"|"DIM"				{ return DIM; }
+"as"|"AS"				{ return AS; }
+"int"|"INT"				{ return INT; }
+"real"|"REAL"			{ return REAL; }
+"enddef"|"ENDDEF"		{ return ENDDEF; }
 "string"|"STRING"		{ return STRING; }
-"ENDDEF"|"enddef"		{ return ENDDEF; }
 "display"|"DISPLAY"		{ return DISPLAY; }
-"get"|"GET"			{ return GET; }
+"get"|"GET"				{ return GET; }
 "while"|"WHILE"			{ return WHILE; }
-"if"|"IF"			{ return IF; }
+"if"|"IF"				{ return IF; }
 "else"|"ELSE"			{ return ELSE; }
-"long|LONG"			{ return LONG; }
-"equmax|EQUMAX"			{ return EQUMAX; }
-"equmin|EQUMIN"			{ return EQUMIN; }
-
-{CONST_INT}			{ 
+"real|REAL"				{ return REAL; }
+{CONST_INT}				{ 
 							strcpy(yylval.strval, yytext);
 							int casteado = atoi(yytext);
 							if( casteado > 65536) {
@@ -72,7 +64,7 @@ EQUMAX			equmax(CONST_INT|CONST_INT*
 						}
 							insertInTs(normalizar(yytext), "CONST_INT", yytext, "");
 							return CONST_INT;
-						 }
+						}
 {CONST_REAL}			{ 	
 							strcpy(yylval.strval, yytext);
 							double casteado = atof(yytext);
@@ -94,7 +86,7 @@ EQUMAX			equmax(CONST_INT|CONST_INT*
 							}
 							char stringLength[20];
 							sprintf(stringLength, "%d", longitud);
-							insertInTs(normalizar(yytext), "CONST_STRING", yytext, stringLength);
+							insertInTs(normalizar(yytext), "CONST_STR", yytext, stringLength);
 							return CONST_STR;	
 						}
 ">"                     { return CMP_MAY;}
@@ -103,30 +95,30 @@ EQUMAX			equmax(CONST_INT|CONST_INT*
 "<="                    { return CMP_MENI;}
 "!="                    { return CMP_DIST;}
 "=="                    { return CMP_IGUAL;}
-":="			{ return OP_ASIG;}
-"+"			{ return OP_SUM;}
-"-"			{ return OP_RES;}
-"*"			{ return OP_MUL;}
-"/"			{ return OP_DIV;}
-"("			{ return P_A;}
-")"			{ return P_C;}
-"["			{ printf("C_A ");}
-"]"			{ printf("C_C ");}
-"{"			{ return L_A;}
-"}"			{ return L_C;}
-";"			{ return PUNTO_Y_COMA;}
-":"			{return DOSPUNTOS;}
-","			{ return COMA;}
-"."			{ return PUNTO;}
-"="			{ return OP_IGUAL;}
-"and"|"AND"		{ return AND;}
-"or"|"OR"		{ return OR;}
-"not"|"NOT"		{ return NOT;}
-{COMENTARIOS} 		{ ;} 
+":="					{ return OP_ASIG;}
+"+"						{ return OP_SUM;}
+"-"						{ return OP_RES;}
+"*"						{ return OP_MUL;}
+"/"						{ return OP_DIV;}
+"("						{ return P_A;}
+")"						{ return P_C;}
+"["						{ return C_A;}
+"]"						{ return C_C;}
+"{"						{ return L_A;}
+"}"						{ return L_C;}
+";"						{ return PUNTO_Y_COMA;}
+":"						{ return DOSPUNTOS;}
+","						{ return COMA;}
+"."						{ return PUNTO;}
+"="						{ return OP_IGUAL;}
+"and"|"AND"				{ return AND;}
+"or"|"OR"				{ return OR;}
+"not"|"NOT"				{ return NOT;}
+{COMENTARIOS} 			{ ;} 
 {ID}					{ 	yylval.strval = strdup(yytext);
-						validarID(yylval.strval);
- 						insertInTs(yytext, "", "", "");
-						return ID;
+							validarID(yylval.strval);
+							insertInTs(yytext, "", "", "");
+							return ID;
 						}
 {ASIG_ESP}				{ return ASIG_ESP;}
 \n\r
@@ -134,11 +126,8 @@ EQUMAX			equmax(CONST_INT|CONST_INT*
 \t
 {ESPACIO}
 " "						
-	/*estos ultimos 5 son para borrar los tabs, expacios, etc*/
-
 
 %%
-
 char* normalizar(char* cadena){
 	char *aux = (char *) malloc( sizeof(char) * (strlen(cadena)) + 2);
 	strcpy(aux,"_");
@@ -160,4 +149,24 @@ int validarID(char *str)
 	}
 	
 	return 1;
+}
+
+int longitud(char *str)
+{
+	int largo = 0;
+	char *aux = str;
+	aux++;
+	int ban = 0;
+	while(*aux != ']')
+	{
+		ban = 1;
+		if(*aux == ',')
+			largo++;
+		aux++;
+	}
+	
+	if(largo > 0 || ban == 0)
+		largo++;
+	
+	printf("%d", largo);
 }

@@ -1,7 +1,42 @@
-[a,b,c,e] \\correcto 4 
-[] \\0 
-[a,b,,e] \\error
-a,b,c,e  \\error
-[a,b,c,e \\error
-a,b,c,e] \\error
+*/Comentario/*
+*/ 35t0 35 un c0m3nt4r10 41f4num3r1c0 /*
 
+*/Declaraciones/*
+DEFVAR
+
+DIM [ var1, var2, var3 ] AS [ int, string, real ]
+
+DIM [ var4 ] AS [ real ] 
+
+ENDDEF
+
+*/Asignaciones/*
+var1 := 5;
+*/var1 = 123456789123456789123456789/*
+*/var2 := "soy la variable 2";/*
+*/var2 = "esta variable se va del rango de 30 permitido para los strings"/*
+*/var3 := 55.64/*
+*/var3 = 123456789123456789123456789.123456789123456789123456789/*
+*/var4 := 100.5/*
+
+*/var3 = var4/*
+*/var3 = var2/*
+
+
+*/Entrada y salida/*
+*/DISPLAY "esto es una salida" /*
+*/GET  var2/*
+DISPLAY var1;
+
+longitud([var1])
+
+*/Decisiones/*
+*/Condicion multiple/*
+if( (var1 > 6) OR (var3 >= var4))
+{
+	*/While/*
+	while(var1 > 3)
+	{
+		var1 -= 1
+	} 
+}
