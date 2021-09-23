@@ -1,8 +1,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include "ts.h"
-
+#include "y.tab.h"
 FILE  *yyin;
 extern int yylineno;
 int yylex();
@@ -10,15 +9,13 @@ int yyerror();
 %}
 
 %union{
-	  char *strval;
-	  char a_e[2];
+	  char* strval;
 }
 
-%token <a_e> ASIG_ESP
 %token DEFVAR DIM AS ENDDEF
 %token REAL INT STRING
 %token CONST_REAL CONST_INT CONST_STR
-%token LISTA LONGITUD
+%token  LONGITUD
 %token DISPLAY GET
 %token IF ELSE WHILE         
 %token P_A P_C C_A C_C L_A L_C PUNTO PUNTO_Y_COMA COMA DOSPUNTOS
@@ -31,191 +28,123 @@ int yyerror();
 %token OP_IGUAL
 
 %%
-
-programa: program {printf("\nprogram - program\nCompilacion exitosa\n");};
+programa: 
+	program {printf("\nprograma - program Compilacion exitosa\n");};
 program:
 	sentencia 				{printf("\nprogram - sentencia");}
 	| program sentencia 	{printf("\nprogram - program sentencia");}
 	;
 	
-sentencia:DEFVAR declaraciones ENDDEF{printf("\nsentencia - DEFVAR declaraciones ENDDEF");}
-			| ID ASIG_ESP factor {printf("\nSentencia - ID ASIG_ESP factor");}
-			| funcion {printf("\nsentencia - funcion");}
-            | asignacion PUNTO_Y_COMA { printf("\nsentencia - asignacion");}
-            | decision              {   printf("\nsentencia - decision");}
-            | iteracion             { printf("\nsentencia - iteracion");}
-            | entrada               {printf("\nsentencia - entrada");}
-            | salida                {printf("\nsentencia - salida");}
-	        ;
-
-funcion: LONGITUD P_A C_A lista_ids C_C P_C{
-													printf("\nsentencia - LONGITUD P_A C_A lista_ids C_C P_C");
-												};
-
-declaraciones:         	        	
-             declaracion					{ printf("\ndeclaraciones - declaracion");}
-             | declaraciones declaracion	{printf("\ndeclaraciones - declaraciones declaracion");}
-    	     ;
-
-declaracion:  DIM C_A lista_ids C_C AS C_A lista_tipo_datos C_C{  
-                                        printf("\ndeclaracion - DIM C_A lista_ids C_C AS C_A lista_tipo_datos C_C");
-                                    }
-			;
-
-lista_ids: ID { printf("\nlista_ids - ID '%s'",yylval.strval);}
-			| lista_ids COMA ID {printf("\nlista_ids - lista_ids COMA ID '%s'",yylval.strval);}
-			;
-			
-tipo_dato: INT 			{	
-							printf("\n tipo de dato : INT");
-						}
-	| REAL			{	
-							printf("\n tipo de dato : REAL");
-						}
-	| STRING		{	
-							printf("\n tipo de dato : STRING");
-						}
+sentencia:
+	DEFVAR declaraciones ENDDEF		{printf("\nsentencia - DEFVAR declaraciones ENDDEF");}
+	| funcion 						{printf("\nsentencia - funcion");}
+    | asignacion PUNTO_Y_COMA 		{printf("\nsentencia - asignacion");}
+    | decision             			{printf("\nsentencia - decision");}
+    | iteracion            			{printf("\nsentencia - iteracion");}
+    | entrada              			{printf("\nsentencia - entrada");}
+    | salida                		{printf("\nsentencia - salida");}
 	;
 
-lista_tipo_datos: tipo_dato {
-									printf("\n lista tipo dato : dato");
-								}
-	| lista_tipo_datos COMA tipo_dato {
-											printf("\n lista tipo dato : lista_datos");
-										}
+funcion:
+	LONGITUD P_A C_A long_ids C_C P_C	{printf("\nfuncion - LONGITUD P_A C_A lista_ids C_C P_C");}
 	;
-entrada:
-    DISPLAY ID  PUNTO_Y_COMA        {printf("\nentrada DISPLAY - ID"); }
-    | DISPLAY constanteString PUNTO_Y_COMA {printf("\nentrada DISPLAY - CONST_STR"); }
-    ;
+
+declaraciones:  
+	declaracion						{printf("\ndeclaraciones - declaracion");}
+    | declaraciones declaracion		{printf("\ndeclaraciones - declaraciones declaracion");}
+	;
+
+declaracion:  
+	DIM C_A lista_ids C_C AS C_A lista_tipo_datos C_C{printf("\ndeclaracion - DIM C_A lista_ids C_C AS C_A lista_tipo_datos C_C");}
+	;
+
+long_ids: 
+	lista_ids {printf("\nlong_ids - lista_ids");}
+	;
+
+lista_ids: 
+	ID { printf("\nlista_ids - ID '%s'",yylval.strval);}
+	| lista_ids COMA ID {printf("\nlista_ids - lista_ids COMA ID '%s'",yylval.strval);}
+	;
+	
+lista_tipo_datos: 
+	tipo_dato {printf("\n lista tipo dato : tipo_dato");}
+	| lista_tipo_datos COMA tipo_dato {printf("\n lista tipo dato : lista_datos");}
+	;
+	
+tipo_dato: 
+	INT {printf("\n tipo de dato : INT");}
+	| REAL		{printf("\n tipo de dato : REAL");}
+	| STRING	{printf("\n tipo de dato : STRING");}
+	;
 	
 asignacion:
-    ID OP_ASIG expresion { printf("\nasignacion ID - OP_ASIG - expresion");}
-    | ID OP_ASIG constanteString { printf("\nasignacion ID - OP_ASIG - CTE_STRING");}
-;
-    
+	ID OP_ASIG expresion 			{printf("\nasignacion ID - OP_ASIG - expresion");}
+    | ID OP_ASIG constanteString 	{printf("\nasignacion ID - OP_ASIG - CTE_STRING");}
+	;
+	
 salida:
-    GET ID  PUNTO_Y_COMA {printf("\nsalida GET - ID"); }
+    DISPLAY ID  PUNTO_Y_COMA        		{printf("\nentrada DISPLAY - ID"); }
+    | DISPLAY constanteString PUNTO_Y_COMA 	{printf("\nentrada DISPLAY - CONST_STR"); }
+    ;
+    
+entrada:
+    GET ID  PUNTO_Y_COMA {printf("\nsalida GET - ID");}
     ;
 
 iteracion:
-     WHILE P_A condicion P_C L_A sentencia L_C { printf("\niteracion - WHILE P_A condicion P_C L_A sentencia L_C");}
+    WHILE P_A condicion P_C L_A sentencia L_C { printf("\niteracion - WHILE P_A condicion P_C L_A sentencia L_C");}
     ;
 
 decision: 
-    IF P_A condicion P_C L_A sentencia L_C {   printf("\ndecision - IF P_A condicion P_C L_A sentencia L_C");
- 
-                                                 }
-   | IF P_A condicion P_C L_A sentencia L_C {  printf("\ndecision - IF P_A condicion P_C L_A sentencia L_C");
-                                                
-                                               
-                                                 }
-    ELSE                                    {   printf("\nInicio del else");
-                                                   }
-    L_A sentencia L_C                      {   printf("\nFin del else");
-                                                
-                                            
-                                                }
- 
+    IF P_A condicion P_C L_A sentencia L_C 		{printf("\ndecision - IF P_A condicion P_C L_A sentencia L_C");}
+	| IF P_A condicion P_C L_A sentencia L_C 	{printf("\ndecision - IF P_A condicion P_C L_A sentencia L_C");}
+    ELSE                                    	{printf("\nInicio del else");}
+    L_A sentencia L_C                      		{printf("\nFin del else");}
    ;
 
 condicion: 
-    expresion CMP_MAY expresion     {   printf("\ncondicion - expresion CMP_MAY expresion");
-                                        
-                                         }
-    | expresion CMP_MEN expresion   {   printf("\ncondicion - expresion CMP_MEN expresion");
-                                        
-                                          }
-    | expresion CMP_MAYI expresion   {  printf("\ncondicion - expresion CMP_MAYI expresion");
-                                        
-                                          }
-    | expresion CMP_MENI expresion  {   printf("\ncondicion - expresion CMP_MENI expresion");
-                                        
-                                         }
-    | expresion CMP_DIST expresion  {   printf("\ncondicion - expresion CMP_DIST expresion");
-                                        
-                                        }
-    | expresion CMP_IGUAL expresion {   printf("\ncondicion - expresion CMP_IGUAL expresion");
-                                        
-                                           }
-
-
-    | P_A condicion P_C AND P_A condicion P_C   {   printf("\ncondicion - AND");
-
-    }
-
-    | P_A condicion P_C OR P_A condicion P_C    {   printf("\ncondicion - OR"); 
-    }
-
-    
-    |NOT expresion CMP_MAY expresion     {   printf("\ncondicion - NOT expresion CMP_MAY expresion");
-                                        
-                                         }
-    |NOT expresion CMP_MEN expresion   {   printf("\ncondicion - NOT expresion CMP_MEN expresion");
-                                        
-                                          }
-    |NOT expresion CMP_MAYI expresion   {  printf("\ncondicion - NOT expresion CMP_MAYI expresion");
-                                        
-                                          }
-    |NOT expresion CMP_MENI expresion  {   printf("\ncondicion - NOT expresion CMP_MENI expresion");
-                                        
-                                          }
-    |NOT expresion CMP_DIST expresion  {   printf("\ncondicion - NOT expresion CMP_DIST expresion");
-                                        
-                                        }
-    |NOT expresion CMP_IGUAL expresion {   printf("\ncondicion - NOT expresion CMP_IGUAL expresion");
-                                        
-                                        }
+    expresion CMP_MAY expresion     			{printf("\ncondicion - expresion CMP_MAY expresion");}
+    | expresion CMP_MEN expresion   			{printf("\ncondicion - expresion CMP_MEN expresion");}
+    | expresion CMP_MAYI expresion   			{printf("\ncondicion - expresion CMP_MAYI expresion");}
+    | expresion CMP_MENI expresion  			{printf("\ncondicion - expresion CMP_MENI expresion");}
+    | expresion CMP_DIST expresion  			{printf("\ncondicion - expresion CMP_DIST expresion");}
+    | expresion CMP_IGUAL expresion 			{printf("\ncondicion - expresion CMP_IGUAL expresion");}
+    | P_A condicion P_C AND P_A condicion P_C   {printf("\ncondicion - AND");}
+    | P_A condicion P_C OR P_A condicion P_C    {printf("\ncondicion - OR");}
+    | NOT expresion CMP_MAY expresion     		{printf("\ncondicion - NOT expresion CMP_MAY expresion");}
+    | NOT expresion CMP_MEN expresion   		{printf("\ncondicion - NOT expresion CMP_MEN expresion");}
+    | NOT expresion CMP_MAYI expresion   		{printf("\ncondicion - NOT expresion CMP_MAYI expresion");}
+    | NOT expresion CMP_MENI expresion  		{printf("\ncondicion - NOT expresion CMP_MENI expresion");}
+    | NOT expresion CMP_DIST expresion  		{printf("\ncondicion - NOT expresion CMP_DIST expresion");}
+    | NOT expresion CMP_IGUAL expresion 		{printf("\ncondicion - NOT expresion CMP_IGUAL expresion");}
     ;
-
-
     
 expresion:
-    expresion OP_SUM termino        {   printf("\nexpresion - expresion OP_SUM termino"); 
-                                        
-                                         }
-    | expresion OP_RES termino      {   printf("\nexpresion - expresion OP_RES termino");
-                                         }
-    | termino                       {   printf("\nexpresion - termino");   }
+    expresion OP_SUM termino        {printf("\nexpresion - expresion OP_SUM termino");}
+    | expresion OP_RES termino      {printf("\nexpresion - expresion OP_RES termino");}
+    | termino                       {printf("\nexpresion - termino");}
     ;
 
 termino: 
-    termino OP_MUL factor       {   printf("\ntermino - termino OP_MUL factor"); 
-                                    
-                                   
-                                    }
-    | termino OP_DIV factor     {   printf("\ntermino - termino OP_DIV factor"); 
-                                    
-                                   
-                                   }
-    | factor                    {   printf("\ntermino - factor");
-                                       }
+    termino OP_MUL factor       {printf("\ntermino - termino OP_MUL factor");}
+    | termino OP_DIV factor     {printf("\ntermino - termino OP_DIV factor");}
+    | factor                    {printf("\ntermino - factor");}
     ;
 
 factor: 
-    P_A expresion P_C           {   printf("\nfactor - P_A expresion P_C");
-                                    }
-    | ID                        {   printf("\nfactor - ID ");
-                                    
-                                    }
-    | constanteNumerica         {   printf("\nfactor - constanteNumerica");
-                                     }  
+    P_A expresion P_C           {printf("\nfactor - P_A expresion P_C");}
+    | ID                        {printf("\nfactor - ID ");}
+    | constanteNumerica         {printf("\nfactor - constanteNumerica");}
     ;
 
 constanteNumerica: 
-    CONST_INT               {   
-                            printf("\nconstante - ENTERO: %s", yylval.strval);
-                            
-                            }
-    | CONST_REAL            {   
-                            printf("\nconstante - REAL: %s" , yylval.strval);
-                                                       
-                            };
+    CONST_INT               {printf("\nconstanteNumerica - ENTERO: %s", yylval.strval);}
+    | CONST_REAL            {printf("\nconstanteNumerica - REAL: %s" , yylval.strval);}
+	;
 
 constanteString: 
-    CONST_STR        {  
-                            printf("\nconstante - STRING %s" , yylval.strval);
-                        }
+    CONST_STR        {printf("\nconstanteString - STRING %s" , yylval.strval);}
     ;
 
 %%
