@@ -2,7 +2,7 @@ bison -dyv sintactico.y
 
 flex lexico.l
 
-gcc lex.yy.c y.tab.c -o prueba.exe
+gcc lex.yy.c y.tab.c -o primera.exe
 pause
 primera.exe prueba.txt
 pause
